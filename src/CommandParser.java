@@ -3,44 +3,77 @@ import java.util.List;
 
 public class CommandParser {
 
+    private final List<String> tokens = new ArrayList<>();
+    private final StringBuilder current = new StringBuilder();
+    private char quote = 0;
+    private boolean hasContent = false;
+
     public List<String> parse(String input) {
-        List<String> tockens = new ArrayList<>();
-
-        StringBuilder current = new StringBuilder();
-        char quote = 0;
-
-
+        reset();
         for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-
-            if (quote == 0) {
-                if (c == '"' || c == '\'') {
-                    quote = c;
-                } else if (Character.isWhitespace(c)) {
-                    tockens.add(current.toString());
-                    current.setLength(0);
-                } else {
-                    current.append(c);
-                }
-            } else {
-                if (c == quote) {
-                    quote = 0;
-                } else if (c == '"' || c == '\'') {
-                    throw new IllegalArgumentException(
-                            "unclosed quote: expected " + quote + " but got " + c
-                    );
-                } else {
-                    current.append(c);
-                }
-            }
+            step(input.charAt(i));
         }
+        return finish();
+    }
 
+    private void reset() {
+        tokens.clear();
+        current.setLength(0);
+        quote = 0;
+        hasContent = false;
+    }
+
+    private void step(char c) {
+        if (quote == 0) {
+            outsideQuote(c);
+        } else {
+            insideQuote(c);
+        }
+    }
+
+    private List<String> finish() {
         if (quote != 0) {
             throw new IllegalArgumentException("unclosed quote: " + quote);
         }
-        if (current.length() > 0) {
-            tockens.add(current.toString());
+        flushToken();
+        return tokens;
+    }
+
+    private void outsideQuote(char c) {
+        if (isQuote(c)) {
+            quote = c;
+            hasContent = true;
+        } else if (Character.isWhitespace(c)) {
+            flushToken();
+        } else {
+            current.append(c);
+            hasContent = true;
         }
-        return tockens;
+    }
+
+    private void insideQuote(char c) {
+        if (c == quote) {
+            quote = 0;
+            hasContent = true;
+        } else if (isQuote(c)) {
+            throw new IllegalArgumentException(
+                    "unclosed quote: expected " + quote + " but got " + c
+            );
+        } else {
+            current.append(c);
+            hasContent = true;
+        }
+    }
+
+    private void flushToken() {
+        if (hasContent) {
+            tokens.add(current.toString());
+            current.setLength(0);
+            hasContent = false;
+        }
+    }
+
+    private boolean isQuote(char c) {
+        return c == '"' || c == '\'';
     }
 }
