@@ -1,6 +1,6 @@
 import java.util.List;
 
-public class CommandHadler {
+public class CommandHandler {
 
     public void execute(String command, List<String> args) {
         if (command.equals("ls")) {

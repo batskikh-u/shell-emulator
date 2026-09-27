@@ -1,0 +1,6 @@
+# Basic startup script
+
+ls
+ls "hello world"
+cd test
+cd "test folder"

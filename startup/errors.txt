@@ -1,0 +1,6 @@
+# Startup script with errors
+
+ls
+unknown
+ls "unclosed
+cd test

@@ -31,3 +31,12 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
+*.csv
+
+# Build artifacts
+build/
+target/
+
+# Temporary files
+*.tmp

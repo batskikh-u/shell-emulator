@@ -1,22 +1,18 @@
-\# Тесты
+Stage 2 tests
 
+1. Проверка запуска:
+   run.bat
 
+2. Проверка параметров:
+   run.bat --vfs ./vfs-test --log ./logs/test.csv --script ./startup/basic.txt --config config/config.ini
 
-На этапе 1 тестирование ручное. Сценарии:
+3. Проверка ошибки конфигурации:
+   run.bat --config config/not-found.ini
 
-
-```
-| №| Ввод | Ожидаемый вывод |
-
-| 1 | ls | ls без аргументов |
-
-| 2 | ls -l "my folder" | аргументы -l, my folder |
-
-| 3 | cd 'a b c' | аргумент a b c |
-
-| 4 | foo | Error: unknown command: foo |
-
-| 5 | ls "unclosed | Error: unclosed quote |
-
-| 6 | exit | The session is over, выход |
-```
+4. Проверка команд:
+   ls
+   ls "hello world"
+   cd test
+   cd "test folder"
+   unknown
+   exit
