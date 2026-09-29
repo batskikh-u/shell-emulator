@@ -1,0 +1,31 @@
+# Stage 3 VFS test
+
+ls
+
+cd level1
+
+ls
+
+cd level2
+
+ls
+
+cd level3
+
+ls
+
+cd ..
+
+ls
+
+cd ..
+
+ls
+
+cd nothing
+
+cd file1.txt
+
+unknown
+
+exit

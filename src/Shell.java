@@ -22,7 +22,9 @@ public class Shell {
         this.logger = logger;
         this.scriptPath = scriptPath;
         this.parser = new CommandParser();
-        this.handler = new CommandHandler();
+
+        VirtualFileSystem vfs = new VirtualFileSystem(vfsPath);
+        this.handler = new CommandHandler(vfs);
     }
 
     public void process() {
@@ -53,6 +55,7 @@ public class Shell {
             for (String line : lines) {
                 processScriptLine(line);
             }
+
         } catch (IOException e) {
             throw new IllegalArgumentException(
                     "Cannot read startup script: " + scriptPath,
@@ -86,6 +89,7 @@ public class Shell {
             }
 
             String command = tokens.get(COMMAND_INDEX);
+
             List<String> args = tokens.subList(
                     ARGUMENTS_START,
                     tokens.size()
@@ -99,6 +103,7 @@ public class Shell {
             }
 
             handler.execute(command, args);
+
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -112,6 +117,9 @@ public class Shell {
 
     private String createVfsName(String vfsPath) {
         Path fileName = Path.of(vfsPath).getFileName();
-        return fileName == null ? vfsPath : fileName.toString();
+
+        return fileName == null
+                ? vfsPath
+                : fileName.toString();
     }
 }
