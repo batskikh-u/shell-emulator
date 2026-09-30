@@ -39,10 +39,7 @@ public class CommandLineParser {
         return result;
     }
 
-    private void parseEqualsArgument(
-            String argument,
-            Map<String, String> result
-    ) {
+    private void parseEqualsArgument(String argument, Map<String, String> result) {
         String[] parts = argument.split("=", 2);
         String key = parts[0];
         String value = parts[1];
@@ -50,11 +47,8 @@ public class CommandLineParser {
         validateKey(key);
 
         if (value.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Missing value for --" + key
-            );
+            throw new IllegalArgumentException("Missing value for --" + key);
         }
-
         putUnique(result, key, value);
     }
 
@@ -87,10 +81,7 @@ public class CommandLineParser {
     }
 
     private void validateKey(String key) {
-        if (!key.equals(VFS)
-                && !key.equals(LOG)
-                && !key.equals(SCRIPT)
-                && !key.equals(CONFIG)) {
+        if (!key.equals(VFS) && !key.equals(LOG) && !key.equals(SCRIPT) && !key.equals(CONFIG)) {
 
             throw new IllegalArgumentException(
                     "Unknown argument: --" + key
@@ -98,11 +89,7 @@ public class CommandLineParser {
         }
     }
 
-    private void putUnique(
-            Map<String, String> result,
-            String key,
-            String value
-    ) {
+    private void putUnique(Map<String, String> result, String key, String value) {
         if (result.containsKey(key)) {
             throw new IllegalArgumentException(
                     "Duplicate argument: --" + key

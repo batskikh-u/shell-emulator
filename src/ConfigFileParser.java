@@ -10,6 +10,7 @@ public class ConfigFileParser {
     private static final String VFS = "vfs";
     private static final String LOG = "log";
     private static final String SCRIPT = "script";
+    private static final int NUMBER = 2;
 
     private final Map<String, String> cliConfigs;
     private final Map<String, String> fileConfigs = new HashMap<>();
@@ -69,7 +70,7 @@ public class ConfigFileParser {
 
         String[] parts = trimmed.split("=", 2);
 
-        if (parts.length != 2) {
+        if (parts.length != NUMBER) {
             throw new IllegalArgumentException(
                     "Invalid configuration line: " + line
             );
