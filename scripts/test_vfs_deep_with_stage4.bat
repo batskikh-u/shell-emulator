@@ -3,5 +3,5 @@
 call run.bat ^
     --vfs ./vfs/deep.zip ^
     --log ./logs/deep.csv ^
-    --script ./startup/stage3.txt ^
+    --script ./startup/stage4.txt ^
     --config ./config/config.ini

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
+import java.nio.charset.StandardCharsets;
 
 public class VirtualFileSystem {
 
@@ -150,6 +151,25 @@ public class VirtualFileSystem {
         return normalized.isEmpty()
                 || files.containsKey(normalized)
                 || directories.contains(normalized);
+    }
+
+    public boolean isFile(String path) {
+        return files.containsKey(normalize(path));
+    }
+
+    public String readFile(String path) {
+        String normalized = normalize(path);
+
+        if (!files.containsKey(normalized)) {
+            throw new IllegalArgumentException(
+                    "file not found: " + path
+            );
+        }
+
+        return new String(
+                files.get(normalized),
+                StandardCharsets.UTF_8
+        );
     }
 
     private String normalize(String path) {

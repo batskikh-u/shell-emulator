@@ -24,7 +24,7 @@ public class Shell {
         this.parser = new CommandParser();
 
         VirtualFileSystem vfs = new VirtualFileSystem(vfsPath);
-        this.handler = new CommandHandler(vfs);
+        this.handler = new CommandHandler(vfs, logger);
     }
 
     public void process() {
