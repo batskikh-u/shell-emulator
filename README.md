@@ -52,111 +52,160 @@
 
 История команд берётся из CSV-лога, который создаётся и дополняется `Logger`.
 
-## Примеры работы
+### Примеры команд
 
 ```text
 deep.zip> ls
 level1
 
-deep.zip> ls level1
-file1.txt
-level2
-
 deep.zip> cd level1
-deep.zip> cd level2
-
-deep.zip> cd ..
 deep.zip> ls
 file1.txt
 level2
 
-deep.zip> tail level1/file1.txt
-This is file 1. It is located in level1.
-
+deep.zip> cd ..
 deep.zip> tail -n 1 level1/file1.txt
 This is file 1. It is located in level1.
 
 deep.zip> history 5
-10  tail level1/file1.txt
-11  tail -n 1 level1/file1.txt
-12  tail -n 2 level1/level2/file2.txt
-13  history
-14  history 5
-
-deep.zip> uptime
-Uptime: 0 minutes 0 seconds
+...
 ```
 
 ### Обработка ошибок
 
+Проверяются ошибки:
+
 ```text
-deep.zip> ls one two
-Error: ls accepts at most one argument
+ls missing
+ls one two
 
-deep.zip> cd level1 level2
-Error: cd requires exactly one argument
+cd missing
+cd level1/file1.txt
+cd level1 level2
 
-deep.zip> cd missing
-Error: directory not found: missing
+tail
+tail missing.txt
+tail -n abc level1/file1.txt
+tail -n 0 level1/file1.txt
 
-deep.zip> tail missing.txt
-Error: file not found: missing.txt
+history abc
+history 0
 
-deep.zip> tail -n abc level1/file1.txt
-Error: invalid line count: abc
+uptime test
+```
 
-deep.zip> tail -n 0 level1/file1.txt
-Error: line count must be positive
+## Этап 5
 
-deep.zip> history abc
-Error: invalid history count: abc
+Добавлена команда изменения владельца объектов виртуальной файловой системы:
 
-deep.zip> uptime test
-Error: uptime does not accept arguments
+* `chown USER PATH` — изменение владельца файла или директории;
+* владельцы виртуальных объектов хранятся в памяти;
+* начальный владелец объектов — `root`;
+* изменение владельца не изменяет исходный ZIP-архив;
+* поддерживается изменение владельца файлов и директорий;
+* поддерживаются относительные пути;
+* добавлена проверка аргументов команды;
+* добавлена обработка ошибок отсутствующих файлов и директорий;
+* добавлен стартовый скрипт `startup/stage5.txt`;
+* добавлен тестовый скрипт `scripts/test_vfs_deep_with_stage5.bat`.
+
+### Примеры `chown`
+
+Изменение владельца файла:
+
+```text
+deep.zip> chown alice level1/file1.txt
+Owner of level1/file1.txt changed to alice
+```
+
+Изменение владельца директории:
+
+```text
+deep.zip> chown bob level1
+Owner of level1 changed to bob
+```
+
+Изменение владельца относительно текущей директории:
+
+```text
+deep.zip> cd level1
+deep.zip> chown developer file1.txt
+Owner of file1.txt changed to developer
+```
+
+Изменения владельцев выполняются только в памяти. Исходный ZIP-файл не изменяется.
+
+### Обработка ошибок `chown`
+
+Проверяются следующие случаи:
+
+```text
+chown
+chown alice
+chown alice level1/file1.txt extra
+chown alice missing.txt
+chown alice missing/directory
 ```
 
 ## Стартовые скрипты
 
-Для тестирования разных этапов используются стартовые скрипты:
+Для тестирования этапов используются отдельные стартовые скрипты:
 
-* `startup/basic.txt` — базовый сценарий;
-* `startup/stage3.txt` — проверка работы с VFS;
-* `startup/stage4.txt` — проверка команд `ls`, `cd`, `tail`, `history`, `uptime` и обработки ошибок.
+```text
+startup/
+├── stage4.txt
+└── stage5.txt
+```
+
+Тестовые `.bat`-скрипты:
+
+```text
+scripts/
+├── test_vfs_deep_with_stage4.bat
+└── test_vfs_deep_with_stage5.bat
+```
 
 ## VFS
 
-Для тестирования используются несколько виртуальных файловых систем:
+Для тестирования используются ZIP-архивы виртуальной файловой системы.
 
-* `vfs/minimal.zip` — минимальная VFS;
-* `vfs/files.zip` — файлы и директории;
-* `vfs/deep.zip` — вложенная структура директорий.
+Основной архив для глубокого тестирования:
+
+```text
+vfs/deep.zip
+```
+
+Пример структуры:
+
+```text
+level1/
+├── file1.txt
+└── level2/
+    ├── file2.txt
+    └── level3/
+```
 
 ## Запуск
 
 ### Windows
 
+Основной запуск:
+
 ```cmd
 run.bat
 ```
 
-Для запуска Stage 4 с тестовым VFS:
+
+Тест Этапа 5:
 
 ```cmd
-scripts\test_vfs_deep_with_stage4.bat
+scripts\test_vfs_deep_with_stage5.bat
 ```
-
-### Параметры командной строки
-
-Пример переопределения настроек:
-
-```cmd
-run.bat --vfs ./vfs/deep.zip --log ./logs/stage4.csv --script ./startup/stage4.txt --config ./config/config.ini
-```
-
-Параметры командной строки имеют приоритет над значениями из конфигурационного файла.
 
 ## Требования
 
 * JDK 17+ (или JDK 11);
-* Windows для запуска `.bat`-скриптов;
-* `make` не требуется для запуска проекта.
+* IntelliJ IDEA или другая Java IDE;
+* Windows для запуска `.bat`-скриптов.
+
+Проект не изменяет содержимое VFS-архивов при выполнении команд, изменяющих состояние виртуальной файловой системы.

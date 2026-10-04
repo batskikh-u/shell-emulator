@@ -8,6 +8,8 @@ public class CommandHandler {
     private static final int NO_LINES = 0;
     private static final long MILLISECONDS_IN_SECOND = 1000;
     private static final long SECONDS_IN_MINUTE = 60;
+    private static final int NUMBER_OF_CHOWN_ARGUMENTS = 2;
+
     private final long startTime;
     private final VirtualFileSystem vfs;
     private final Logger logger;
@@ -42,6 +44,11 @@ public class CommandHandler {
         }
         if (command.equals("uptime")) {
             executeUptime(args);
+            return;
+        }
+
+        if (command.equals("chown")) {
+            executeChown(args);
             return;
         }
 
@@ -278,7 +285,7 @@ public class CommandHandler {
 
     private void executeHistory(List<String> args) {
 
-        if (args.size() > 1) {
+        if (args.size() > MIN_ARGUMENTS) {
             throw new IllegalArgumentException("history accepts at most one argument");
         }
 
@@ -321,5 +328,22 @@ public class CommandHandler {
         long seconds = totalSeconds % SECONDS_IN_MINUTE;
 
         System.out.println("Uptime: " + minutes + " minutes " + seconds + " seconds");
+    }
+
+    private void executeChown(List<String> args) {
+        if (args.size() != NUMBER_OF_CHOWN_ARGUMENTS) {
+            throw new IllegalArgumentException("chown requires an owner and a path");
+        }
+
+        String owner = args.get(0);
+        String path = resolvePath(args.get(1));
+
+        if (owner.isEmpty()) {
+            throw new IllegalArgumentException("owner cannot be empty");
+        }
+
+        vfs.changeOwner(path, owner);
+
+        System.out.println("Owner of " + args.get(1) + " changed to " + owner);
     }
 }

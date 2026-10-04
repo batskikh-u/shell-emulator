@@ -1,0 +1,73 @@
+# Stage 5: basic commands and chown
+
+# ls
+
+ls
+ls level1
+
+# cd
+
+cd level1
+ls
+cd level2
+ls
+cd ..
+ls
+cd ..
+
+# tail
+
+tail level1/file1.txt
+tail -n 1 level1/file1.txt
+tail -n 2 level1/level2/file2.txt
+
+# history
+
+history
+history 5
+
+# uptime
+
+uptime
+
+# chown
+
+chown alice level1/file1.txt
+chown bob level1
+chown student level1/level2/file2.txt
+
+# chown with relative path
+
+cd level1
+chown developer file1.txt
+cd ..
+
+# Work with VFS after chown
+
+ls
+ls level1
+
+# Errors
+
+ls missing
+ls one two
+
+cd missing
+cd level1/file1.txt
+cd level1 level2
+
+tail
+tail missing.txt
+tail -n abc level1/file1.txt
+tail -n 0 level1/file1.txt
+
+history abc
+history 0
+
+uptime test
+
+chown
+chown alice
+chown alice level1/file1.txt extra
+chown alice missing.txt
+chown alice missing/directory

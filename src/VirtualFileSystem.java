@@ -15,8 +15,11 @@ import java.nio.charset.StandardCharsets;
 
 public class VirtualFileSystem {
 
+    private static final String DEFAULT_OWNER = "root";
+
     private final Map<String, byte[]> files = new HashMap<>();
     private final List<String> directories = new ArrayList<>();
+    private final Map<String, String> owners = new HashMap<>();
 
     public VirtualFileSystem(String zipPath) {
         load(zipPath);
@@ -61,6 +64,7 @@ public class VirtualFileSystem {
             throws IOException {
 
         files.put(path, readBytes(zip));
+        owners.put(path, DEFAULT_OWNER);
 
         addParentDirectories(path);
     }
@@ -68,6 +72,7 @@ public class VirtualFileSystem {
     private void addDirectory(String path) {
         if (!path.isEmpty() && !directories.contains(path)) {
             directories.add(path);
+            owners.put(path, DEFAULT_OWNER);
         }
 
         addParentDirectories(path);
@@ -81,6 +86,7 @@ public class VirtualFileSystem {
 
             if (!directories.contains(parent)) {
                 directories.add(parent);
+                owners.put(path, DEFAULT_OWNER);
             }
 
             slash = parent.lastIndexOf('/');
@@ -184,5 +190,18 @@ public class VirtualFileSystem {
         }
 
         return result;
+    }
+
+    public void changeOwner(String path, String owner) {
+        String normalized = normalize(path);
+        if (!exists(normalized)) {
+            throw new IllegalArgumentException("file or directory not found: " + path);
+        }
+
+        if (normalized.isEmpty()) {
+            throw new IllegalArgumentException("cannot change owner or root directory");
+        }
+
+        owners.put(normalized, owner);
     }
 }
