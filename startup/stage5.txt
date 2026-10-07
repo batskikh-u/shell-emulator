@@ -46,6 +46,29 @@ cd ..
 
 ls
 ls level1
+# ls flags
+
+ls -l
+ls -h
+ls -a
+
+ls -lh
+ls -hl
+ls -la
+ls -al
+ls -ha
+ls -ah
+ls -lha
+ls -hal
+
+ls -l level1
+ls -lh level1
+ls -lha level1
+
+# ls flag errors
+
+ls -x
+ls -lx
 
 # Errors
 

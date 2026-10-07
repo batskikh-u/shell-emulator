@@ -146,6 +146,88 @@ chown alice level1/file1.txt extra
 chown alice missing.txt
 chown alice missing/directory
 ```
+### Расширенные возможности `ls`
+
+Команда `ls` поддерживает дополнительные флаги:
+
+* `-l` — подробный вывод;
+* `-h` — человекочитаемый размер файлов;
+* `-a` — отображение скрытых файлов и директорий;
+* флаги можно объединять в любом порядке: `-lh`, `-la`, `-lha`, `-hal` и т.д.
+
+Примеры:
+
+```text
+deep.zip> ls
+file1.txt
+level2
+
+deep.zip> ls -l
+- developer 42 file1.txt
+d root 0 level2
+
+deep.zip> ls -lh
+- developer 42 B file1.txt
+d root 0 B level2
+
+deep.zip> ls -a
+.config
+file1.txt
+level2
+
+deep.zip> ls -lha
+- root 12 B .config
+- developer 42 B file1.txt
+d root 0 B level2
+```
+
+В подробном режиме используется следующий формат:
+
+```text
+ТИП ВЛАДЕЛЕЦ РАЗМЕР ИМЯ
+```
+
+Где:
+
+* `-` — обычный файл;
+* `d` — директория;
+* владелец хранится в памяти VFS и может быть изменён командой `chown`;
+* размер файла указывается в байтах или в человекочитаемом формате при использовании `-h`.
+
+Флаги можно комбинировать:
+
+```text
+ls -lh
+ls -hl
+ls -la
+ls -al
+ls -ha
+ls -ah
+ls -lha
+ls -hal
+```
+
+Также можно указывать путь:
+
+```text
+ls -l level1
+ls -lh level1
+ls -lha level1
+```
+
+Неизвестные флаги обрабатываются как ошибки:
+
+```text
+deep.zip> ls -x
+Error: unknown ls option: -x
+```
+
+Если указано несколько путей:
+
+```text
+deep.zip> ls one two
+Error: ls accepts at most one path
+```
 
 ## Стартовые скрипты
 

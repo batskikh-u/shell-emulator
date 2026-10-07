@@ -86,7 +86,7 @@ public class VirtualFileSystem {
 
             if (!directories.contains(parent)) {
                 directories.add(parent);
-                owners.put(path, DEFAULT_OWNER);
+                owners.put(parent, DEFAULT_OWNER);
             }
 
             slash = parent.lastIndexOf('/');
@@ -203,5 +203,33 @@ public class VirtualFileSystem {
         }
 
         owners.put(normalized, owner);
+    }
+
+    public String getOwner(String path) {
+        String normalized = normalize(path);
+
+        if (!exists(normalized)) {
+            throw new IllegalArgumentException("file or directory not found: " + path);
+        }
+
+        if (normalized.isEmpty()) {
+            return DEFAULT_OWNER;
+        }
+
+        return owners.getOrDefault(normalized, DEFAULT_OWNER);
+    }
+
+    public long getSize(String path) {
+        String normalized = normalize(path);
+
+        if (files.containsKey(normalized)) {
+            return files.get(normalized).length;
+        }
+
+        if (directories.contains(normalized) || normalized.isEmpty()) {
+            return 0;
+        }
+
+        throw new IllegalArgumentException("file or directory not found: " + path);
     }
 }

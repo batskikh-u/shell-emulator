@@ -58,30 +58,108 @@ public class CommandHandler {
     }
 
     private void executeLs(List<String> args) {
+        boolean longFormat = hasFlag(args, 'l');
+        boolean humaneReadable = hasFlag(args, 'h');
+        boolean showAll = hasFlag(args, 'a');
 
-        if (args.size() > 1) {
-            throw new IllegalArgumentException(
-                    "ls accepts at most one argument"
-            );
-        }
-
-        String directory = currentDirectory;
-
-        if (!args.isEmpty()) {
-            directory = resolvePath(args.get(0));
-        }
+        String directory = getLsDirectory(args);
 
         if (!vfs.isDirectory(directory)) {
-            throw new IllegalArgumentException(
-                    "not a directory: " + args.get(0)
+            throw new IllegalArgumentException("not a directory: " + directory);
+        }
+
+        printLs(directory, longFormat, humaneReadable, showAll);
+    }
+
+    private boolean hasFlag(List<String> args, char flag) {
+        for (String arg:args) {
+            if (!arg.startsWith("-")) {
+                continue;
+            }
+
+            if (arg.indexOf(flag, 1) >= 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String getLsDirectory(List<String> args) {
+        String directory = currentDirectory;
+        boolean pathFound = false;
+
+        for (String arg:args) {
+            if (arg.startsWith("-")) {
+                continue;
+            }
+            if (pathFound) {
+                throw new IllegalArgumentException( "ls accepts at most one path"
+                );
+            }
+            directory = resolvePath(arg);
+            pathFound = true;
+        }
+        return directory;
+    }
+
+    private void printLs(String directory, boolean longFormat, boolean humanReadable, boolean showAll) {
+        List<String> files = vfs.list(directory);
+
+        for (String file: files) {
+            if (!showAll && file.startsWith(".")) {
+                continue;
+            }
+            if (longFormat) {
+                printLongEntry(directory, file, humanReadable);
+            } else {
+                System.out.println(file);
+            }
+        }
+    }
+
+    private void printLongEntry(
+            String directory,
+            String name,
+            boolean humanReadable
+    ) {
+        String path = directory.isEmpty()
+                ? name
+                : directory + "/" + name;
+
+        String type = vfs.isDirectory(path) ? "d" : "-";
+        String owner = vfs.getOwner(path);
+        long size = vfs.getSize(path);
+
+        String sizeText = humanReadable
+                ? formatSize(size)
+                : String.valueOf(size);
+
+        System.out.println(
+                type + " " + owner + " " + sizeText + " " + name
+        );
+    }
+
+    private String formatSize(long size) {
+
+        if (size < 1024) {
+            return size + " B";
+        }
+
+        if (size < 1024 * 1024) {
+            return String.format("%.1f KB", size / 1024.0);
+        }
+
+        if (size < 1024L * 1024 * 1024) {
+            return String.format(
+                    "%.1f MB",
+                    size / (1024.0 * 1024.0)
             );
         }
 
-        List<String> files = vfs.list(directory);
-
-        for (String file : files) {
-            System.out.println(file);
-        }
+        return String.format(
+                "%.1f GB",
+                size / (1024.0 * 1024.0 * 1024.0)
+        );
     }
 
     private void executeCd(List<String> args) {
